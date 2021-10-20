@@ -14,6 +14,8 @@ DEFAULT_INTERVAL = 10
 # Window information is stored in a logfile according to that path:
 DEFAULT_LOGFILE = os.path.join(os.path.dirname(__file__), "windows.log")
 
+DEBUG = False
+
 
 def get_active_window_info():
     """Find information about the currently active window, using xprop."""
@@ -55,9 +57,11 @@ def get_active_window_info():
 
 #TODO make it possible to change default settings by passing command line args
 if __name__=="__main__":
-    debug_log = os.path.join(os.path.dirname(__file__), "debug.log")
-    logging.basicConfig(filename=debug_log, level=logging.DEBUG)
+    if DEBUG:
+        debug_log = os.path.join(os.path.dirname(__file__), "debug.log")
+        logging.basicConfig(filename=debug_log, level=logging.DEBUG)
 
+    #TODO only run if there is not already a background process doing the same
     start_time = time.time()
     while True:
         logging.debug("Writing active window information to file '%s' ..." % DEFAULT_LOGFILE)
