@@ -21,10 +21,15 @@ def get_active_window_info():
     stdout, stderr = root.communicate()
 
     logging.debug(stdout)
+    logging.debug(stderr)
 
     m = re.search(b'^_NET_ACTIVE_WINDOW.* ([\w]+)$', stdout)
     if m != None:
         window_id = m.group(1)
+
+        if window_id==b"0x0":
+            return None
+
         window = subprocess.Popen(['xprop', '-id', window_id], stdout=subprocess.PIPE)
         stdout, stderr = window.communicate()
     else:
