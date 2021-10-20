@@ -4,6 +4,7 @@ import subprocess
 import time
 import json
 import datetime
+import logging
 
 
 # Window information is collected according to the following interval
@@ -19,6 +20,8 @@ def get_active_window_info():
     root = subprocess.Popen(['xprop', '-root', '_NET_ACTIVE_WINDOW'], stdout=subprocess.PIPE)
     stdout, stderr = root.communicate()
 
+    logging.debug(stdout)
+
     m = re.search(b'^_NET_ACTIVE_WINDOW.* ([\w]+)$', stdout)
     if m != None:
         window_id = m.group(1)
@@ -32,10 +35,12 @@ def get_active_window_info():
         match = re.match(b"WM_NAME\(\w+\) = (?P<name>.+)$", line)
         if match is not None:
             info['title'] = match.group("name").strip(b'"').decode('utf-8')
+            logging.debug("Title found: %s" % info["title"])
 
         match = re.match(b"WM_CLASS\(\w+\) = (?P<class>.+)$", line)
         if match is not None:
             info['class'] = match.group("class").decode('utf-8').replace('"', '') #.strip(b'"')
+            logging.debug("Class found: %s" % info["class"])
 
     if len(info):
         return info
@@ -45,9 +50,13 @@ def get_active_window_info():
 
 #TODO make it possible to change default settings by passing command line args
 if __name__=="__main__":
+    debug_log = os.path.join(os.path.dirname(__file__), "debug.log")
+    logging.basicConfig(filename=debug_log, level=logging.DEBUG)
+
     start_time = time.time()
     while True:
-        #print("Writing active window information to file '%s' ..." % DEFAULT_LOGFILE)
+        logging.debug("Writing active window information to file '%s' ..." % DEFAULT_LOGFILE)
+
         with open(DEFAULT_LOGFILE, 'a') as f:
             f.write(datetime.datetime.now().isoformat() + '\t')
             f.write(json.dumps(get_active_window_info()))
