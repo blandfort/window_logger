@@ -1,9 +1,9 @@
 import re
+import os
 import subprocess
 import time
 import json
 import datetime
-import logging
 
 
 # Window information is collected according to the following interval
@@ -11,7 +11,7 @@ import logging
 DEFAULT_INTERVAL = 10
 
 # Window information is stored in a logfile according to that path:
-DEFAULT_LOGFILE = "windows.log"
+DEFAULT_LOGFILE = os.path.join(os.path.dirname(__file__), "windows.log")
 
 
 def get_active_window_info():
@@ -47,7 +47,7 @@ def get_active_window_info():
 if __name__=="__main__":
     start_time = time.time()
     while True:
-        #logging.info("Writing active window information to file '%s' ..." % DEFAULT_LOGFILE)
+        #print("Writing active window information to file '%s' ..." % DEFAULT_LOGFILE)
         with open(DEFAULT_LOGFILE, 'a') as f:
             f.write(datetime.datetime.now().isoformat() + '\t')
             f.write(json.dumps(get_active_window_info()))
@@ -60,4 +60,4 @@ if __name__=="__main__":
         sleep_time = max(DEFAULT_INTERVAL - passed_time, 0)
         time.sleep(sleep_time)
 
-        start_time = next_time
+        start_time = time.time()
